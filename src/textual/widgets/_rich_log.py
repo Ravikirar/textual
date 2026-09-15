@@ -265,14 +265,16 @@ class RichLog(ScrollView, can_focus=True):
                 self._start_line += len(self.lines) - self.max_lines
                 self.refresh()
                 self.lines = self.lines[-self.max_lines :]
-
-            # Compute the width after wrapping and trimming
-            # TODO - this is wrong because if we trim a long line, the max width
-            #  could decrease, but we don't look at which lines were trimmed here.
-            self._widest_line_width = max(
-                self._widest_line_width,
-                max(sum([segment.cell_length for segment in _line]) for _line in lines),
-            )
+                # When lines are trimmed, recalculate widest line width from remaining lines
+                self._widest_line_width = max(
+                    (strip.cell_length for strip in self.lines),
+                    default=0,
+                )
+            else:
+                self._widest_line_width = max(
+                    self._widest_line_width,
+                    max(sum([segment.cell_length for segment in _line]) for _line in lines),
+                )
 
         # Update the virtual size - the width may have changed after adding
         # the new line(s), and the height will definitely have changed.
