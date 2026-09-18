@@ -60,6 +60,21 @@ You can disable this behavior by setting `ansi_color=True` in the [App construct
 
 We recommend the default behavior for full-screen apps, but you may want to preserve ANSI colors in [inline](#run-inline) apps.
 
+### Clipboard
+
+Use [`App.copy_to_clipboard`][textual.app.App.copy_to_clipboard] to copy text from a Textual app to the terminal's clipboard. Textual also stores the most recent text copied this way in the read-only [`App.clipboard`][textual.app.App.clipboard] property.
+
+```python
+self.app.copy_to_clipboard("Text copied from my app")
+latest_copy = self.app.clipboard
+```
+
+The `clipboard` property is local to the Textual app. It starts as an empty string and only contains text passed to `copy_to_clipboard`; it does not read text that was copied by other applications or elsewhere in the operating system.
+
+!!! note
+
+    Copying to the terminal clipboard depends on terminal support. In particular, it does not work in macOS Terminal, although it is supported by most other terminals.
+
 ## Events
 
 Textual has an [event system](./events.md) you can use to respond to key presses, mouse actions, and internal state changes. Event handlers are methods prefixed with `on_` followed by the name of the event.
