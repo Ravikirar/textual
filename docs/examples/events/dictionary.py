@@ -1,5 +1,3 @@
-import asyncio
-
 try:
     import httpx
 except ImportError:
@@ -7,6 +5,7 @@ except ImportError:
 
 from rich.json import JSON
 
+from textual import work
 from textual.app import App, ComposeResult
 from textual.containers import VerticalScroll
 from textual.widgets import Input, Static
@@ -21,23 +20,23 @@ class DictionaryApp(App):
         yield Input(placeholder="Search for a word")
         yield VerticalScroll(Static(id="results"), id="results-container")
 
-    async def on_input_changed(self, message: Input.Changed) -> None:
-        """A coroutine to handle a text changed message."""
-        if message.value:
-            # Look up the word in the background
-            asyncio.create_task(self.lookup_word(message.value))
-        else:
-            # Clear the results
-            self.query_one("#results", Static).update()
+    def on_input_changed(self, message: Input.Changed) -> None:
+        """Handle a changed input value."""
+        self.lookup_word(message.value)
 
+    @work(exclusive=True)
     async def lookup_word(self, word: str) -> None:
-        """Looks up a word."""
+        """Look up a word in a worker."""
+        results_widget = self.query_one("#results", Static)
+        if not word:
+            results_widget.update()
+            return
+
         url = f"https://api.dictionaryapi.dev/api/v2/entries/en/{word}"
         async with httpx.AsyncClient() as client:
             results = (await client.get(url)).text
 
-        if word == self.query_one(Input).value:
-            self.query_one("#results", Static).update(JSON(results))
+        results_widget.update(JSON(results))
 
 
 if __name__ == "__main__":
