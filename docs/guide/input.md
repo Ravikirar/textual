@@ -37,6 +37,14 @@ The key event contains the following attributes which your app can use to know h
 
 The `key` attribute is a string which identifies the key that was pressed. The value of `key` will be a single character for letters and numbers, or a longer identifier for other keys.
 
+##### Key identifiers
+
+Textual uses key identifiers as stable, machine-readable names for key events and bindings. Printable letters and numbers are represented by the character itself (for example, `a` or `7`). Shifted letters may be represented by an uppercase character, such as `A`.
+
+Printable punctuation is normalized to a readable name derived from its Unicode name. Textual shortens a few common names; for example, `?` becomes `question_mark`, `/` becomes `slash`, `\\` becomes `backslash`, `@` becomes `at`, `-` becomes `minus`, `+` becomes `plus`, and `_` becomes `underscore`. Non-printable keys use names such as `enter`, `escape`, `home`, and `f1`.
+
+Modifiers are joined to the key with `+`, for example `ctrl+p`, `shift+home`, or `ctrl+shift+left`. A comma is not part of a key identifier; in a [binding](#bindings), commas separate multiple keys that should invoke the same action.
+
 Some keys may be combined with the ++shift++ key. In the case of letters, this will result in a capital letter as you might expect. For non-printable keys, the `key` attribute will be prefixed with `shift+`. For example, ++shift+home++ will produce an event with `key="shift+home"`.
 
 Many keys can also be combined with ++ctrl++ which will prefix the key with `ctrl+`. For instance, ++ctrl+p++ will produce an event with `key="ctrl+p"`.
@@ -44,6 +52,20 @@ Many keys can also be combined with ++ctrl++ which will prefix the key with `ctr
 !!! warning
 
     Not all keys combinations are supported in terminals and some keys may be intercepted by your OS. If in doubt, run `textual keys` from the command line.
+
+##### Display format
+
+When Textual displays a binding in a [Footer](../widgets/footer.md) or key panel, [`App.get_key_display`][textual.app.App.get_key_display] converts the identifier to a compact human-readable form. For example:
+
+| Key identifier | Default display |
+| -------------- | --------------- |
+| `question_mark` | `?` |
+| `enter` | `⏎` |
+| `left` | `←` |
+| `ctrl+q` | `^q` |
+| `shift+home` | `shift+home` |
+
+You can override the display for an individual [`Binding`][textual.binding.Binding] with its `key_display` argument. To customize key display throughout an app, override [`App.get_key_display`][textual.app.App.get_key_display].
 
 #### character
 
