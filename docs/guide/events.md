@@ -310,7 +310,7 @@ If your event handlers are coroutines it will allow multiple events to be proces
 
     To re-use the chef analogy, if an order comes in for beef wellington (which takes a while to cook), orders may start to pile up and customers may have to wait for their meal. The solution would be to have another chef work on the wellington while the first chef picks up new orders.
 
-Network access is a common cause of slow handlers. If you try to retrieve a file from the internet, the message handler may take anything up to a few seconds to return, which would prevent the widget or app from updating during that time. The solution is to launch a new asyncio task to do the network task in the background.
+Network access is a common cause of slow handlers. If you try to retrieve a file from the internet, the message handler may take anything up to a few seconds to return, which would prevent the widget or app from updating during that time. The solution is to run the network task in a [worker](workers.md), so the handler can return immediately while the work continues in the background.
 
 Let's look at an example which looks up word definitions from an [api](https://dictionaryapi.dev/) as you type.
 
@@ -320,7 +320,7 @@ Let's look at an example which looks up word definitions from an [api](https://d
 
 === "dictionary.py"
 
-    ```python title="dictionary.py" hl_lines="28"
+    ```python title="dictionary.py" hl_lines="24 27"
     --8<-- "docs/examples/events/dictionary.py"
     ```
 === "dictionary.tcss"
@@ -334,4 +334,4 @@ Let's look at an example which looks up word definitions from an [api](https://d
     ```{.textual path="docs/examples/events/dictionary.py"}
     ```
 
-Note the highlighted line in the above code which calls `asyncio.create_task` to run a coroutine in the background. Without this you would find typing into the text box to be unresponsive.
+The call to `lookup_word` returns immediately because the [`work`][textual.work] decorator runs the coroutine in a worker. The `exclusive=True` argument cancels the previous lookup whenever the input changes, preventing an older response from replacing a newer one. See the [Workers guide](workers.md) for more information.
